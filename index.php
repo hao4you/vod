@@ -68,18 +68,17 @@ $options = [
 
 
 $response = curl_post('https://ctb.1919hdtv.com/xmlapi/xml_api.php', $headers, $data,$options);
-//$response = Requests::post('https://ctb.1919hdtv.com/xmlapi/xml_api.php', $headers, $data,$options);
-	print_r($response->body);
+print_r($response->body);
 $content = str_replace('&','&amp;',$response->body);
 
 $content = str_replace('&','&amp;',$response->body);
 
 //echo $content;
 $xml=simplexml_load_string($content);
-//echo $m3u8 = $xml->list->url;
-//if($m3u8){
-//	header("Location:".$m3u8);
-//}
+echo $m3u8 = $xml->list->url;
+if($m3u8){
+	header("Location:".$m3u8);
+}
 echo '#EXTM3U
 #EXT-X-VERSION:3
 #EXT-X-STREAM-INF:BANDWIDTH=7095315,CODECS="avc1.64001f,mp4a.40.2",RESOLUTION=1280x720
