@@ -1,15 +1,8 @@
 <?php
-//header("Content-type: text/xml");
-//echo $_SERVER['PHP_SELF'];
-//echo ":";
-//echo $_SERVER["QUERY_STRING"];
-
-require_once ('../class/library/Requests.php');
 date_default_timezone_set('America/Los_Angeles');
-Requests::register_autoloader();
 $id = @$_REQUEST['id'];
 if(!isset($id)){
-$id = 216;	
+$id = 2;	
 }
 $ids = array(
 	'1'=>'208',
@@ -72,37 +65,48 @@ $data = [
 $options = [
 	'timeout'=> 25
 ];
-/*
-if(file_exists($filePath) && filesize($filePath)>300){
-	$content = file_get_contents($filePath);
-}else{
-	$response = Requests::post('https://ctb.1919hdtv.com/xmlapi/xml_api.php', $headers, $data,$options);
-	//print_r($response->body);
-	$content = $response->body;
-	file_put_contents($filePath,$content);
-	
-	
-}
-*/
-$response = Requests::post('https://ctb.1919hdtv.com/xmlapi/xml_api.php', $headers, $data,$options);
-	//print_r($response->body);
+
+
+$response = curl_post('https://ctb.1919hdtv.com/xmlapi/xml_api.php', $headers, $data,$options);
+//$response = Requests::post('https://ctb.1919hdtv.com/xmlapi/xml_api.php', $headers, $data,$options);
+	print_r($response->body);
 $content = str_replace('&','&amp;',$response->body);
 
 $content = str_replace('&','&amp;',$response->body);
 
 //echo $content;
 $xml=simplexml_load_string($content);
-$m3u8 = $xml->list->url;
-//$m3u8 = str_replace('live03.1919hdtv.com','61.58.156.10',$m3u8);
-if($m3u8){
-	header("Location:".$m3u8);
-}
-
+//echo $m3u8 = $xml->list->url;
+//if($m3u8){
+//	header("Location:".$m3u8);
+//}
 echo '#EXTM3U
 #EXT-X-VERSION:3
 #EXT-X-STREAM-INF:BANDWIDTH=7095315,CODECS="avc1.64001f,mp4a.40.2",RESOLUTION=1280x720
 ';
 
 echo $m3u8 = $xml->list->url;
+
+function curl_post($url ,$headers=array(),$data,$options){
+		$cookie_jar_index = 'cookie.txt';
+		$cookie = "PHPSESSID=0c241uo8cchkdou5mm4feiim84; path=/; __cfduid=dccb4d0ffb0f76b193e0811475a804d061599211613; expires=Sun, 04-Oct-20 09:26:53 GMT; path=/; domain=.1919hdtv.com; HttpOnly; SameSite=Lax";
+        $ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        // POST数据
+        curl_setopt($ch, CURLOPT_POST, 1);
+        // 把post的变量加上
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers); 
+		curl_setopt($ch, CURLOPT_COOKIE, $cookie);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        return $output;
+    }
+
+
+
 
 ?>
